@@ -20,6 +20,7 @@ http://www.gsxt.gov.cn/index
 添加环境变量===我的电脑--右击‘属性’==高级系统设置==环境变量==PATH----‘python_2\Scipts’
 
 解压phantomjs到python\Scripts下
+
 安装PIL ====1.1.7
 
 chromedriver.exe放到python\Scripts下
@@ -28,10 +29,10 @@ pip install selenium
 
 
 程序：
-# chrom
+# chrome
 from selenium import webdriver
 
-# chromedriver.exe模拟器可以看到chrom现象！
+# chromedriver.exe模拟器可以看到chrome现象！
 obj = webdriver.Chrome(executable_path=r"E:\python_2\Scripts\chromedriver.exe")
 
 obj.get('https://www.baidu.com/')
