@@ -1,6 +1,6 @@
 # -*-coding:utf-8-*-
 import requests
-import re,os
+import re,os,sys
 import StringIO
 # from io import StringIO#python3导入方式
 from PIL import Image
@@ -14,9 +14,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.proxy import Proxy
+from selenium.webdriver.common.proxy import ProxyType
 import selenium
-import process_sample_track as pst
 import pandas as pd
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 my_url = "http://www.gsxt.gov.cn/index"
 
@@ -97,6 +102,11 @@ class gsxt(object):
         self.br.set_script_timeout(8)
 
     def input_params(self, name):
+        # self.br.implicitly_wait(30)# 没起作用
+        # 延时
+        self.br.set_page_load_timeout(30)
+        self.br.set_script_timeout(30)
+
         self.br.get(my_url)
         # self.br.save_screenshot("index.png")# 主页图片
         cc = self.br.get_cookies()
@@ -130,7 +140,7 @@ class gsxt(object):
         move_to_element(to_element) ——鼠标移动到某个元素
         move_to_element_with_offset(to_element, xoffset, yoffset) ——移动到距某个元素（左上角坐标）多少距离的位置
         '''
-
+        time.sleep(1)
         element = self.br.find_element_by_class_name("gt_slider_knob")
         # click_and_hold(on_element=None) ——点击鼠标左键，不松开
         # perform() ——执行链中的所有动作
@@ -223,13 +233,15 @@ class gsxt(object):
         time.sleep(0.8)
         element = self.wait_for(By.CLASS_NAME, "gt_info_text")
         ans = element.text.encode("utf-8")
+        time.sleep(0.5)
         print u'##结果',ans
         return ans
 
     def run(self):
-        for i in [u'招商银行', u'交通银行', u'中国银行']:
+        # list_com = [raw_input(u'输入公司名：')]
+        for i in [u'招商银行']:
             self.hack_geetest(i)
-            time.sleep(1)
+            time.sleep(2)
         self.quit_webdriver()
 
     def quit_webdriver(self):
@@ -243,11 +255,14 @@ class gsxt(object):
             tracks = crack_picture(img_url1, img_url2).pictures_recover()
             tsb = self.emulate_track(tracks)
             if '通过' in tsb:
-                time.sleep(1)
+                time.sleep(2)
+                self.br.save_screenshot("10.png")
                 soup = BeautifulSoup(self.br.page_source, 'html.parser')
+                self.br.save_screenshot("11.png")
                 for sp in soup.find_all("a", attrs={"class": "search_list_item"}):
                     print (re.sub("\s+", "", sp.get_text().encode("utf-8")))
                     print sp.get_text()
+                time.sleep(2)
                 break
             elif '吃' in tsb:
                 time.sleep(5)
@@ -261,12 +276,43 @@ class gsxt(object):
             dcap = dict(DesiredCapabilities.PHANTOMJS)
             dcap["phantomjs.page.settings.userAgent"] = (
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36")
-            # 加载网址
-            return webdriver.PhantomJS(executable_path='E:\python_2\Scripts\phantomjs.exe',desired_capabilities=dcap)
+            # 需要改源码__init__，添加proxy=None,RemoteWebDriver.__init__，添加proxy=proxy
+            proxy = Proxy(
+                {
+                    'proxyType': ProxyType.MANUAL,
+                    'httpProxy': get_proxy_ip_port()
+                }
+            )
+            driver = webdriver.PhantomJS(executable_path='E:\python_2\Scripts\phantomjs.exe',desired_capabilities=dcap,proxy=proxy)
+            return driver
 
         elif name.lower() == "chrome":
+            chromedriver = r"E:\python_2\Scripts\chromedriver.exe"
+            chome_options = webdriver.ChromeOptions()
+            chome_options.add_argument(('--proxy-server=' + get_proxy_ip_port()))
+            driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chome_options)
+            # driver = webdriver.Chrome(executable_path=chromedriver)
+            return driver
 
-            return webdriver.Chrome(executable_path=r"E:\python_2\Scripts\chromedriver.exe")
+        elif name.lower() == "firfox":
+            proxy = Proxy(
+                {
+                    'proxyType': ProxyType.MANUAL,
+                    'httpProxy': get_proxy_ip_port()
+                }
+            )
+            driver = webdriver.Firefox(proxy=proxy)
+            return driver
+
+# 测试代理IP接口
+def get_proxy_ip_port():
+    url = ''
+    resp = requests.get(url)
+    if resp.status_code == 200:
+        a = re.search(r'(.+?),',resp.text.strip()).group(1)
+        proxy_ip = 'http://' + a
+        print u'从代理API获取代理IP: {}'.format(proxy_ip)
+        return  proxy_ip
 
 
 
@@ -274,3 +320,4 @@ if __name__ == "__main__":
     # print crack_picture("http://static.geetest.com/pictures/gt/fc064fc73/fc064fc73.jpg", "http://static.geetest.com/pictures/gt/fc064fc73/bg/7ca363b09.jpg").pictures_recover()
     gsxt("chrome").run()
     # gsxt().run()
+    # get_proxy_ip_port()
