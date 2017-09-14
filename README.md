@@ -2,7 +2,11 @@
 # python2.7！
 
 http://www.gsxt.gov.cn/index
+获得详细页的url和cookie，就可以拿数据了
 可以尝试手机APP！！！
+
+代码和方法只供学习交流使用！产生的一切责任，本人概不负责！！
+
 
 验证码很让人头疼----极验，现在6.0版本来了，用这种方式实现，通过率只有一成！！
 极验的机器学习太强了，可以考虑换IP实现！
@@ -10,8 +14,6 @@ http://www.gsxt.gov.cn/index
 感谢https://github.com/darbra/geetest
 
 希望大家可以一起交流781816703@qq.com
-
-
 
 
 
@@ -24,6 +26,8 @@ http://www.gsxt.gov.cn/index
 安装PIL ====1.1.7
 
 chromedriver.exe放到python\Scripts下
+火狐geckodriver.exe
+
 
 pip install selenium
 

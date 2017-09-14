@@ -1,4 +1,5 @@
 # -*-coding:utf-8-*-
+# __author__ = 'retime123'
 import requests
 import re,os,sys
 import StringIO
@@ -109,8 +110,7 @@ class gsxt(object):
 
         self.br.get(my_url)
         # self.br.save_screenshot("index.png")# 主页图片
-        cc = self.br.get_cookies()
-        # print cc
+
         element = self.wait_for(By.ID, "keyword")
         element.send_keys(name)
         time.sleep(1.1)
@@ -233,7 +233,6 @@ class gsxt(object):
         time.sleep(0.8)
         element = self.wait_for(By.CLASS_NAME, "gt_info_text")
         ans = element.text.encode("utf-8")
-        time.sleep(0.5)
         print u'##结果',ans
         return ans
 
@@ -242,7 +241,7 @@ class gsxt(object):
         for i in [u'招商银行']:
             self.hack_geetest(i)
             time.sleep(2)
-        self.quit_webdriver()
+        # self.quit_webdriver()
 
     def quit_webdriver(self):
         self.br.quit()
@@ -258,10 +257,18 @@ class gsxt(object):
                 time.sleep(2)
                 self.br.save_screenshot("10.png")
                 soup = BeautifulSoup(self.br.page_source, 'html.parser')
-                self.br.save_screenshot("11.png")
-                for sp in soup.find_all("a", attrs={"class": "search_list_item"}):
+                with open('gsxt.txt', 'w') as f:
+                    f.write('')
+                for i, sp in enumerate(soup.find_all("a", attrs={"class": "search_list_item"})):
+                    cc = self.br.get_cookies()
+                    link = "http://www.gsxt.gov.cn" + sp.get('href')
+                    self.get_detail(link)# 详细页的url可以直接访问
+
                     print (re.sub("\s+", "", sp.get_text().encode("utf-8")))
                     print sp.get_text()
+                    with open('gsxt.txt','a+') as f:
+                        f.write(link)
+                        f.write(sp.get_text())
                 time.sleep(2)
                 break
             elif '吃' in tsb:
@@ -269,7 +276,14 @@ class gsxt(object):
             else:
                 self.input_params(company)
 
-
+    def get_detail(self, link):
+        driver = self.get_webdriver('phantomjs')
+        driver.set_page_load_timeout(30)
+        driver.set_script_timeout(30)
+        driver.get(link)
+        time.sleep(5)
+        driver.save_screenshot("2eeee.png")
+        driver.quit()
 
     def get_webdriver(self, name):
         if name.lower() == "phantomjs":
@@ -295,13 +309,14 @@ class gsxt(object):
             return driver
 
         elif name.lower() == "firfox":
+            firfoxdriver = r"E:\python_2\Scripts\geckodriver.exe"
             proxy = Proxy(
                 {
                     'proxyType': ProxyType.MANUAL,
                     'httpProxy': get_proxy_ip_port()
                 }
             )
-            driver = webdriver.Firefox(proxy=proxy)
+            driver = webdriver.Firefox(executable_path=firfoxdriver,proxy=proxy)
             return driver
 
 # 测试代理IP接口
@@ -318,6 +333,14 @@ def get_proxy_ip_port():
 
 if __name__ == "__main__":
     # print crack_picture("http://static.geetest.com/pictures/gt/fc064fc73/fc064fc73.jpg", "http://static.geetest.com/pictures/gt/fc064fc73/bg/7ca363b09.jpg").pictures_recover()
-    gsxt("chrome").run()
+    # gsxt("chrome").run()
+    # gsxt("firfox").run()# 驱动版本低了，先用chrome
     # gsxt().run()
     # get_proxy_ip_port()
+    q = gsxt()
+    a=q.get_webdriver("chrome")
+    a.set_page_load_timeout(30)
+    a.set_script_timeout(30)
+    a.get('http://www.gsxt.gov.cn/%7Bbo0rkJxd81LiFSgqRenFkRm4Nz0De9XHzkO_pEXO-5fPSMx8KTux6SDdN06MFLJUb1knCHZQNYqrop69rGOz9PgE34NK4VCL_qZDqVs9b5Lb1CdBCQNs5dSZbvoLyN-Rq0CiVydfLcPeYUuPLceUwg-1505384030282%7D')
+    a.save_screenshot("2eeee.png")
+    a.quit()
