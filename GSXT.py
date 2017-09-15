@@ -1,5 +1,5 @@
 # -*-coding:utf-8-*-
-# __author__ = 'retime123'
+__author__ = 'retime123'
 import requests
 import re,os,sys
 import StringIO
@@ -29,6 +29,7 @@ my_url = "http://www.gsxt.gov.cn/index"
 
 class crack_picture(object):
     def __init__(self, img_url1, img_url2):
+        # 缓存两个图片
         self.img1, self.img2 = self.picture_get(img_url1, img_url2)
 
     def picture_get(self, img_url1, img_url2):
@@ -36,6 +37,7 @@ class crack_picture(object):
               "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"}
         img1 = StringIO.StringIO(self.repeat(img_url1, hd).content)
         img2 = StringIO.StringIO(self.repeat(img_url2, hd).content)
+        # 返回stringIO对象
         return img1, img2
 
     def repeat(self, url, hd):
@@ -56,6 +58,7 @@ class crack_picture(object):
     def picture_recover(self, img, name):
         a = [39, 38, 48, 49, 41, 40, 46, 47, 35, 34, 50, 51, 33, 32, 28, 29, 27, 26, 36, 37, 31, 30, 44, 45, 43, 42, 12,
              13, 23, 22, 14, 15, 21, 20, 8, 9, 25, 24, 6, 7, 3, 2, 0, 1, 11, 10, 4, 5, 19, 18, 16, 17]
+        # 使用pil进行处理,返回PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=312x116对象
         im = Image.open(img)
         im_new = Image.new("RGB", (260, 116))
         for row in range(2):
@@ -96,12 +99,15 @@ class crack_picture(object):
 
 class gsxt(object):
     def __init__(self, br_name="phantomjs"):
+        # 传入chrome浏览器,调用get_webdriver()方法
         self.br = self.get_webdriver(br_name)
         # self.br.save_screenshot("10.png")
-        self.wait = WebDriverWait(self.br, 10, 1.0)
+        # 调用显式超时时间,最长超时时间为15秒，每1秒扫描一次页面
+        self.wait = WebDriverWait(self.br, 15, 1.0)
         self.br.set_page_load_timeout(8)
         self.br.set_script_timeout(8)
 
+    # 执行页面搜索
     def input_params(self, name):
         # self.br.implicitly_wait(30)# 没起作用
         # 延时
@@ -128,7 +134,7 @@ class gsxt(object):
 
     def find_img_url(self, element):
         try:
-            # 提取图片像素里面的 url
+            # 替换，将结尾为webp的扩展名替换为jpg
             return re.findall('url\("(.*?)"\)', element.get_attribute('style'))[0].replace("webp", "jpg")
         except:
             return re.findall('url\((.*?)\)', element.get_attribute('style'))[0].replace("webp", "jpg")
@@ -241,6 +247,7 @@ class gsxt(object):
         for i in [u'招商银行']:
             self.hack_geetest(i)
             time.sleep(2)
+        # 退出浏览器
         # self.quit_webdriver()
 
     def quit_webdriver(self):
@@ -250,6 +257,7 @@ class gsxt(object):
         flag = True
         self.input_params(company)
         while flag:
+            # 获取图片地址
             img_url1, img_url2 = self.drag_pic()
             tracks = crack_picture(img_url1, img_url2).pictures_recover()
             tsb = self.emulate_track(tracks)
