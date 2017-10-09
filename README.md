@@ -9,6 +9,7 @@ http://www.gsxt.gov.cn/index
 
 
 验证码很让人头疼----极验，现在6.0版本来了，用这种方式实现，通过率只有一成！！
+增加geetest_gsxt_selenium.py成功率有三四成！！！
 极验的机器学习太强了!
 还有一点是轨迹！！可以考虑使用已经成功的历史轨迹来作为当前的轨迹！！
 感谢https://github.com/darbra/geetest
