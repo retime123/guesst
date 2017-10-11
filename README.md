@@ -54,3 +54,10 @@ dcap["phantomjs.page.settings.userAgent"] = (
 
 obj = webdriver.PhantomJS(executable_path='E:\python_2\Scripts\phantomjs.exe', desired_capabilities=dcap)  # 加载网址
 obj.get('https://www.baidu.com/')
+
+
+# 添加普通验证码的识别，test文件下
+pytesser依赖于PIL(图像处理)
+
+
+
