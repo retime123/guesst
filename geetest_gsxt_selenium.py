@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2017/7/3 0003 14:01
-# @Author  : Lee
-# @Site    : 
-# @File    : geetest_gsxt_selenium.py
-# @Software: PyCharm Community Edition
+
 import requests
 import re
 import StringIO

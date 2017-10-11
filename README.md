@@ -24,7 +24,8 @@ http://www.gsxt.gov.cn/index
 
 解压phantomjs到python\Scripts下
 
-安装PIL ====1.1.7
+### 安装PIL ====1.1.7
+http://www.pythonware.com/products/pil/index.htm
 
 chromedriver.exe放到python\Scripts下
 火狐geckodriver.exe
